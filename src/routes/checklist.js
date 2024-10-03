@@ -6,29 +6,40 @@ const Checklist = require('../models/checklist')
 
 router.get('/', async (req, res) => {
   try {
-    let checklist = await Checklist.find()
-    res.status(200).json(checklist)
+    let checklists = await Checklist.find()
+    res.status(200).render('checklists/index', {checklists:checklists})
   } catch (error) {
-    res.status(500).json(error)
+    res.status(500).render('pages/error',{error: 'Erro ao exbir as Listas'})
 
   }
 })
 router.post('/', async (req, res) => {
   let { name } = req.body;
+  let checklist = new Checklist({name});
   try {
-    let checklist = await Checklist.create({ name })
-    res.status(200).json(checklist)
+    await Checklist.save();
+    res.redirect('/checklists');
   } catch (error) {
     res.status(402).json(error)
+  }
+})
+
+router.get('/new', async (req,res) => {
+  try {
+    let checklist = new Checklist();
+    res.status(200).render('checklist/new', {checklist:checklist })
+  } catch (error) {
+    res.status(500).render('pages/error', {error: 'Erro ao exibir as Listas de tarefas'})
   }
 })
 
 router.get('/:id', async (req, res) => {
   try {
     let checklist = await Checklist.findById(req.params.id)
-    res.status(200).json(checklist)
+    res.status(200).render('checklists/show', {checklist:checklist})
+    
   } catch (error) {
-    res.status(500).json(error)
+    res.status(500).render('pages/error', {error: 'Erro ao exibir as Listas de tarefas'})
   }
 })
 
@@ -52,3 +63,4 @@ router.delete('/:id', async (req, res) => {
 })
 
 module.exports = router
+
